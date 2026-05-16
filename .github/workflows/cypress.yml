@@ -10,6 +10,9 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -20,9 +23,14 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies and run Cypress
-        uses: cypress-io/github-action@v6
-        with:
-          install: true
-          build: echo "No build step required"
-          command: npx cypress run
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Cypress binary
+        run: npx cypress install
+
+      - name: Verify Cypress
+        run: npx cypress verify
+
+      - name: Run Cypress tests
+        run: npx cypress run

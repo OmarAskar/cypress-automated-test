@@ -1,11 +1,30 @@
 const { defineConfig } = require('cypress')
+const createBundler = require('@bahmutov/cypress-esbuild-preprocessor')
+const {
+  addCucumberPreprocessorPlugin,
+} = require('@badeball/cypress-cucumber-preprocessor')
+const {
+  createEsbuildPlugin,
+} = require('@badeball/cypress-cucumber-preprocessor/esbuild')
+
+async function setupNodeEvents(on, config) {
+  await addCucumberPreprocessorPlugin(on, config)
+
+  on(
+    'file:preprocessor',
+    createBundler({
+      plugins: [createEsbuildPlugin(config)],
+    })
+  )
+
+  return config
+}
 
 module.exports = defineConfig({
-  projectId: "jkbtks",
   e2e: {
     baseUrl: 'https://practicesoftwaretesting.com',
+    specPattern: 'cypress/features/**/*.feature',
     supportFile: 'cypress/support/e2e.js',
-    defaultCommandTimeout: 10000,
-    pageLoadTimeout: 20000
-  }
+    setupNodeEvents,
+  },
 })
